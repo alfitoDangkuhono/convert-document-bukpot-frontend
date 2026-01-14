@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Upload, FileText, CheckCircle, X } from 'lucide-react';
 import './style.css';
+import {downloadAction} from './api/download.api.js';
+import { saveAs } from "file-saver";
 
 export default function PDFUploadLanding() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [filename, setfilename] = useState("2026011417130.xlsx");
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -48,6 +51,32 @@ export default function PDFUploadLanding() {
     setUploadedFiles(prev => prev.filter(file => file.id !== id));
   };
 
+  const uploadFile = () => {
+    downloadFile()
+  }
+
+  const downloadFile = async () => {
+    try {
+        const blob = await downloadAction.downloads(filename);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.download = filename;
+        
+        // Trigger click
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      alert("Gagal download file!");
+    }
+  };
+
   return (
     <div className="app-container">
       {/* Header */}
@@ -55,9 +84,9 @@ export default function PDFUploadLanding() {
         <div className="header-content">
           <div className="logo-section">
             <FileText className="logo-icon" />
-            <h1 className="logo-text">PDF Upload</h1>
+            <h1 className="logo-text">Rekap Bukpot To Excel</h1>
           </div>
-          <button className="sign-in-btn">Sign In</button>
+          {/* <button className="sign-in-btn">Sign In</button> */}
         </div>
       </header>
 
@@ -66,9 +95,9 @@ export default function PDFUploadLanding() {
         <div className="container">
           {/* Hero Section */}
           <div className="hero-section">
-            <h2 className="hero-title">Upload Your PDF Files</h2>
+            <h2 className="hero-title">Upload Your Bukpot PDF Files</h2>
             <p className="hero-subtitle">
-              Drag and drop your PDF files or click to browse. Fast, secure, and easy to use.
+              website ini digunakan untuk convert bukti potong pajak menjadi report dengan ouput file excel
             </p>
           </div>
 
@@ -100,7 +129,9 @@ export default function PDFUploadLanding() {
               
               <p className="file-limit">Maximum file size: 5MB per file</p>
             </div>
-
+            {/* <button className="process-btn" onClick={uploadFile}>
+                Download File
+              </button> */}
             {/* Uploaded Files List */}
             {uploadedFiles.length > 0 && (
               <div className="files-section">
@@ -108,6 +139,9 @@ export default function PDFUploadLanding() {
                   <CheckCircle className="check-icon" />
                   Uploaded Files ({uploadedFiles.length})
                 </h4>
+                <button className="process-btn" onClick={uploadFile}>
+                  Process {uploadedFiles.length} File{uploadedFiles.length > 1 ? 's' : ''}
+                </button>
                 <div className="files-list">
                   {uploadedFiles.map(file => (
                     <div key={file.id} className="file-item">
@@ -127,16 +161,12 @@ export default function PDFUploadLanding() {
                     </div>
                   ))}
                 </div>
-                
-                <button className="process-btn">
-                  Process {uploadedFiles.length} File{uploadedFiles.length > 1 ? 's' : ''}
-                </button>
               </div>
             )}
           </div>
 
           {/* Features */}
-          <div className="features-grid">
+          {/* <div className="features-grid">
             <div className="feature-card">
               <div className="feature-icon-wrapper">
                 <Upload className="feature-icon" />
@@ -166,7 +196,7 @@ export default function PDFUploadLanding() {
                 Simple drag and drop interface for seamless file management
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
       </main>
     </div>
