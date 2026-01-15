@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Upload, FileText, CheckCircle, X } from 'lucide-react';
 import './style.css';
 import {downloadAction} from './api/download.api.js';
+import {uploadAction} from './api/upload.api.js';
 import { saveAs } from "file-saver";
 
 export default function PDFUploadLanding() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [filename, setfilename] = useState("2026011417130.xlsx");
+  const fileInputRef = useRef(null);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -51,18 +52,41 @@ export default function PDFUploadLanding() {
     setUploadedFiles(prev => prev.filter(file => file.id !== id));
   };
 
-  const uploadFile = () => {
-    downloadFile()
+  const uploadFile = async () => {
+
+    if (uploadedFiles.length == 0) return;
+
+    const formData = new FormData();
+    uploadedFiles.forEach((item) => {
+      formData.append("pdf",item.file)
+    });
+    
+    try {
+      const res = await uploadAction.uploads(formData)
+
+      if(res.message === 'ok'){
+        downloadFile(res.filename);
+        setUploadedFiles([]);
+        
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+      
+    } catch (error) {
+
+      console.error(error);
+    }
   }
 
-  const downloadFile = async () => {
+  const downloadFile = async (filenames) => {
     try {
-        const blob = await downloadAction.downloads(filename);
+        const blob = await downloadAction.downloads(filenames);
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
 
         link.href = url;
-        link.download = filename;
+        link.download = filenames;
         
         // Trigger click
         document.body.appendChild(link);
@@ -71,7 +95,6 @@ export default function PDFUploadLanding() {
         // Cleanup
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-
     } catch (error) {
       alert("Gagal download file!");
     }
@@ -110,6 +133,7 @@ export default function PDFUploadLanding() {
               className={`drop-zone ${isDragging ? 'dragging' : ''}`}
             >
               <input
+                ref={fileInputRef}
                 type="file"
                 id="fileInput"
                 className="file-input"
