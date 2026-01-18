@@ -3,12 +3,13 @@ import { Upload, FileText, CheckCircle, X } from 'lucide-react';
 import './style.css';
 import {downloadAction} from './api/download.api.js';
 import {uploadAction} from './api/upload.api.js';
-import { saveAs } from "file-saver";
+import Loading from "./components/loader";
 
 export default function PDFUploadLanding() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const fileInputRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -39,7 +40,28 @@ export default function PDFUploadLanding() {
   };
 
   const addFiles = (files) => {
-    const newFiles = files.map(file => ({
+    
+    const MAX_SIZE = 5 * 1024 * 1024;
+    const validFiles = [];
+    const invalidFiles = [];
+
+    files.forEach(file => {
+      if(file.size >= MAX_SIZE) {
+        invalidFiles.push(file.name)
+      }else{
+        validFiles.push(file)
+      }
+    })
+
+    if(invalidFiles.length > 0){
+      if(invalidFiles.length === 1){
+        alert(`${invalidFiles[0]} melebehi ukuran maksimal 5MB`);
+      }else{
+        alert(`${invalidFiles.length} file melebihi ukuran maksimal 5MB:\n- ${invalidFiles.join('\n- ')}`);
+      }
+    }
+
+    const newFiles = validFiles.map(file => ({
       id: Math.random().toString(36).substr(2, 9),
       name: file.name,
       size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
@@ -54,7 +76,9 @@ export default function PDFUploadLanding() {
 
   const uploadFile = async () => {
 
-    if (uploadedFiles.length == 0) return;
+    if (uploadedFiles.length === 0 || isLoading) return;
+
+    setIsLoading(true);
 
     const formData = new FormData();
     uploadedFiles.forEach((item) => {
@@ -67,6 +91,7 @@ export default function PDFUploadLanding() {
       if(res.message === 'ok'){
         downloadFile(res.filename);
         setUploadedFiles([]);
+        setIsLoading(false);
         
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
@@ -74,8 +99,8 @@ export default function PDFUploadLanding() {
       }
       
     } catch (error) {
-
-      console.error(error);
+      setIsLoading(false);
+      alert("error upload file")
     }
   }
 
@@ -153,10 +178,6 @@ export default function PDFUploadLanding() {
               
               <p className="file-limit">Maximum file size: 5MB per file</p>
             </div>
-            {/* <button className="process-btn" onClick={uploadFile}>
-                Download File
-              </button> */}
-            {/* Uploaded Files List */}
             {uploadedFiles.length > 0 && (
               <div className="files-section">
                 <h4 className="files-header">
@@ -164,7 +185,7 @@ export default function PDFUploadLanding() {
                   Uploaded Files ({uploadedFiles.length})
                 </h4>
                 <button className="process-btn" onClick={uploadFile}>
-                  Process {uploadedFiles.length} File{uploadedFiles.length > 1 ? 's' : ''}
+                  { isLoading ? (<Loading/>) : ( <span> Process {uploadedFiles.length} File{uploadedFiles.length > 1 ? 's' : ''}  </span> ) }
                 </button>
                 <div className="files-list">
                   {uploadedFiles.map(file => (
