@@ -56,11 +56,13 @@ export default function PDFUploadLanding() {
     if(invalidFiles.length > 0){
       if(invalidFiles.length === 1){
         alert(`${invalidFiles[0]} melebehi ukuran maksimal 5MB`);
+        return
       }else{
         alert(`${invalidFiles.length} file melebihi ukuran maksimal 5MB:\n- ${invalidFiles.join('\n- ')}`);
+        return
       }
     }
-
+  
     const newFiles = validFiles.map(file => ({
       id: Math.random().toString(36).substr(2, 9),
       name: file.name,
@@ -75,7 +77,7 @@ export default function PDFUploadLanding() {
   };
 
   const uploadFile = async () => {
-
+         
     if (uploadedFiles.length === 0 || isLoading) return;
 
     setIsLoading(true);
