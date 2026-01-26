@@ -84,7 +84,7 @@ export default function PDFUploadLanding() {
 
     const formData = new FormData();
     uploadedFiles.forEach((item) => {
-      formData.append("pdf",item.file)
+      formData.append("files",item.file)
     });
     
     try {
@@ -123,6 +123,8 @@ export default function PDFUploadLanding() {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
     } catch (error) {
+      
+      console.error(error);
       alert("Gagal download file!");
     }
   };

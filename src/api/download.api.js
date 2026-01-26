@@ -2,12 +2,8 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
 
 export const downloadAction = {
     downloads: async (filename) => {
-        const response = await fetch(`${API_BASE_URL}/downloads`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ filename })
+        const response = await fetch(`${API_BASE_URL}/downloads/${filename}`, {
+            method: 'GET',
         });
 
         if (!response.ok) {
