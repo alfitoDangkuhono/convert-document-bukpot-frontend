@@ -51,7 +51,7 @@ pipeline {
             steps {
                 sh '''
                   cd /opt/bukpot/frontend
-                  docker compose down
+                  docker compose stop app-bukpot-frontend
                   docker compose pull
                   docker compose up -d
                 '''
