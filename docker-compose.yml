@@ -3,7 +3,7 @@ services:
     image: alfitodangkuhono/front-end_bukpot:${TAG}
     container_name: app-bukpot-frontend
     ports:
-      - "3001:82"
+      - "3001:80"
     networks:
       - bukpot
 networks:
