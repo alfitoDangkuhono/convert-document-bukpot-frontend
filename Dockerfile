@@ -14,7 +14,6 @@ FROM nginx:alpine
 # Hapus default config kalau mau custom
 # RUN rm /etc/nginx/conf.d/default.conf
 
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/build /usr/share/nginx/html
 
 CMD ["nginx", "-g", "daemon off;"]
