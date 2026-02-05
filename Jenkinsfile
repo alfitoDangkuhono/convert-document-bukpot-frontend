@@ -47,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to local server') {
+        stage('Deploy to Development server') {
             steps {
                 sh '''
                   cd /opt/bukpot/frontend
