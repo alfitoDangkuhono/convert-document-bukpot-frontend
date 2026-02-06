@@ -17,7 +17,7 @@ pipeline {
 
         stage("Build Env File") {
             steps {
-                withCredentials([file(credentialsId: 'frontend_env_bukpot', variable: 'ENV_FILE')]) {
+                withCredentials([file(credentialsId: 'new-credential-bukpot-fe', variable: 'ENV_FILE')]) {
                     script {
                         def envContent = readFile(env.ENV_FILE)
                         writeFile file: '.env', text: envContent
