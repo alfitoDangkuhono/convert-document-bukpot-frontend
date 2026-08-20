@@ -1,9 +1,9 @@
 services:
-  frontend:
-    image: alfitodangkuhono/front-end_bukpot:${TAG}
-    container_name: app-bukpot-frontend
+  convert-bukpot-app:
+    image: alfitodangkuhono/front-end_bukpot:latest
+    container_name: convert-bukpot-app
     ports:
-      - "3001:80"
+      - "3002:80"
     networks:
       - bukpot
 networks:
